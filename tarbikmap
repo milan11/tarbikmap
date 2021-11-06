@@ -1,0 +1,149 @@
+#!/bin/bash
+
+set -e
+set -u
+set -x
+
+ipAB=172.16
+
+ipGateway=1
+ipNginx=2
+ipApp=3
+ipZipper=4
+ipSelenium=5
+ipTests=6
+ipTestsBrowser=7
+
+createNetwork() {
+  local name=$1
+  local ipC=$2
+
+  docker network create --driver bridge --subnet $ipAB.$ipC.0/24 --gateway $ipAB.$ipC.$ipGateway tarbikmap-net-$name
+}
+
+cleanupNetwork() {
+  local name=$1
+
+  docker network rm tarbikmap-net-$name
+}
+
+createApp() {
+  local name=$1
+  local ipC=$2
+  local environment=$3
+  local port=$4
+
+  if [ "$port" = "" ]; then
+    local portConfig=""
+  else
+    local portConfig="-p $port:443"
+  fi
+
+  docker run -d $portConfig --network tarbikmap-net-$name --ip $ipAB.$ipC.$ipNginx -e TARBIKMAP_IP=$ipAB.$ipC.$ipApp --name tarbikmap-nginx-$name tarbikmap-nginx
+  docker run -d --network tarbikmap-net-$name --ip $ipAB.$ipC.$ipApp -e TARBIKMAP_ENVIRONMENT=$environment --name tarbikmap-app-$name tarbikmap-app
+}
+
+cleanupApp() {
+  local name=$1
+
+  docker stop tarbikmap-app-$name
+  docker stop tarbikmap-nginx-$name
+  docker rm tarbikmap-app-$name
+  docker rm tarbikmap-nginx-$name
+}
+
+createTestsAndExports() {
+  local name=$1
+  local ipC=$2
+
+  docker run --network tarbikmap-net-$name --ip $ipAB.$ipC.$ipZipper --mount type=bind,source=$(pwd)/outputs/zip,target=/out --name tarbikmap-zipper-$name tarbikmap-zipper
+  docker run -d --network tarbikmap-net-$name --ip $ipAB.$ipC.$ipSelenium -e SE_NODE_MAX_SESSIONS=20 -e SE_NODE_OVERRIDE_MAX_SESSIONS=true  --shm-size="2g" --name tarbikmap-selenium-$name selenium/standalone-chrome:4.0.0-rc-2-prerelease-20210916
+  docker run --network tarbikmap-net-$name --ip $ipAB.$ipC.$ipTests --mount type=bind,source=$(pwd)/outputs/tests,target=/out -e TARBIKMAP_ENVIRONMENT=testing --name tarbikmap-tests-$name tarbikmap-tests
+  docker run --network tarbikmap-net-$name -e TARBIKMAP_SELENIUM_URL=http://$ipAB.$ipC.$ipSelenium:4444 -e TARBIKMAP_APP_URL=https://$ipAB.$ipC.$ipNginx -e TARBIKMAP_SCREENSHOTS_DIRECTORY=/screenshots -e TARBIKMAP_ENVIRONMENT=testing --ip $ipAB.$ipC.$ipTestsBrowser --mount type=bind,source=$(pwd)/outputs/tests_browser,target=/out --mount type=bind,source=$(pwd)/outputs/screenshots,target=/screenshots --name tarbikmap-tests-browser-$name tarbikmap-tests-browser
+}
+
+cleanupTestsAndExports() {
+  local name=$1
+
+  docker stop tarbikmap-zipper-$name
+  docker stop tarbikmap-selenium-$name
+  docker stop tarbikmap-tests-$name
+  docker stop tarbikmap-tests-browser-$name
+  docker rm tarbikmap-zipper-$name
+  docker rm tarbikmap-selenium-$name
+  docker rm tarbikmap-tests-$name
+  docker rm tarbikmap-tests-browser-$name
+}
+
+prepareCleanOutputsDirs() {
+  if [ -e "outputs" ]; then
+    rm -rf outputs
+  fi
+  
+  mkdir outputs
+  mkdir outputs/tests
+  mkdir outputs/tests_browser
+  mkdir outputs/screenshots
+  mkdir outputs/zip
+}
+
+build() {
+  docker build -t tarbikmap-app --target out-app .
+  docker build -t tarbikmap-zipper --target out-zipper .
+  docker build -t tarbikmap-nginx nginx
+  docker build -t tarbikmap-tests --target out-tests .
+  docker build -t tarbikmap-tests-browser --target out-tests-browser .
+}
+
+command=$1
+
+if [ $command = "build" ] ; then
+  name=testing
+
+  set +e
+  cleanupApp $name
+  cleanupTestsAndExports $name
+  cleanupNetwork $name
+  set -e
+
+  prepareCleanOutputsDirs
+  build
+
+  createNetwork $name 1
+  createApp $name 1 "testing" ""
+  createTestsAndExports $name 1
+
+  cleanupApp $name
+  cleanupTestsAndExports $name
+  cleanupNetwork $name
+
+  exit 0
+fi
+
+if [ $command = "start" ] ; then
+  name=production
+
+  set +e
+  cleanupApp $name
+  cleanupNetwork $name
+  set -e
+
+  createNetwork $name 2
+  createApp $name 2 "production" 38443
+
+  exit 0
+fi
+
+if [ $command = "stop" ] ; then
+  name=production
+
+  set +e
+  cleanupApp $name
+  cleanupNetwork $name
+  set -e
+
+  exit 0
+fi
+
+echo "Invalid command: $command"
+exit 1

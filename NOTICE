@@ -1,0 +1,16 @@
+This project directly contains data from:
+- TarbikMap.Resources/areas/natural_earth: Natural Earth (https://www.naturalearthdata.com)
+- TarbikMap.Resources/fonts/open_sans_regular: OpenMapTiles fonts - Open Sans font (https://github.com/openmaptiles/fonts/tree/master/open-sans)
+- TarbikMap.Resources/pages/preset_images: Wikimedia (https://www.wikimedia.org)
+- TarbikMap.Resources/sprites/default: OSM Bright GL Style (https://openmaptiles.github.io/osm-bright-gl-style/sprite)
+- TarbikMap.Resources/tasks/wikidata: Wikidata (https://www.wikidata.org)
+- TarbikMap.Resources/tiles: OpenStreetMap (https://www.openstreetmap.org), OpenMapTiles (https://openmaptiles.org)
+- TarbikMap/config/*/public/style_example.json: OSM Bright GL Style (https://github.com/openmaptiles/osm-bright-gl-style)
+
+This project uses other dependencies which are downloaded during build and are declared in:
+- .csproj files
+- package.json files
+
+This project uses third-party APIs.
+
+Please see /about page for more info.

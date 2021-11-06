@@ -1,0 +1,15 @@
+{
+  "styles": [
+    {
+      "url": "https://<current_host>/config/style_example.json?currentHost=<current_host>",
+      "has_tiles": [
+        {
+          "zoom": "all",
+          "x": "all",
+          "y": "all"
+        }
+      ]
+    }
+  ],
+  "default_font": "open_sans_regular"
+}

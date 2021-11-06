@@ -1,0 +1,7 @@
+{
+  "GoogleStreetViewStaticApiKey": "",
+  "GoogleGeocodingApiKey": "",
+  "FlickrApiKey": "",
+  "DownloaderCacheDirectory": "../_download_cache",
+  "ServeMapResources": "true"
+}

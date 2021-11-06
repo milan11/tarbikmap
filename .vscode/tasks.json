@@ -1,0 +1,95 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build_web",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/TarbikMap/TarbikMap.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "build_data_getting_wiki_data",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/TarbikMap.DataGetting.WikiData/TarbikMap.DataGetting.WikiData.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "build_data_getting_wiki_data_classes",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/TarbikMap.DataGetting.WikiDataClasses/TarbikMap.DataGetting.WikiDataClasses.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "build_tests",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/TarbikMap.Tests/TarbikMap.Tests.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "build_tests_browser",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/TarbikMap.Tests.Browser/TarbikMap.Tests.Browser.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "build_tests_tasks",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/TarbikMap.Tests.Tasks/TarbikMap.Tests.Tasks.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "publish debug",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["publish", "${workspaceFolder}/TarbikMap/TarbikMap.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish release",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["publish", "-c", "Release", "${workspaceFolder}/TarbikMap/TarbikMap.csproj"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "watch",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["watch", "run", "${workspaceFolder}/TarbikMap/TarbikMap.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
