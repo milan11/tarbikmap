@@ -12,7 +12,7 @@ namespace TarbikMap.Utils
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA3003", Justification = "We check the file name")]
         public static Stream GetStream(string container, string subcontainer, string fileName)
         {
-            if (fileName.Contains("/", StringComparison.Ordinal) || fileName.Contains("\\", StringComparison.Ordinal) || fileName.Contains("~", StringComparison.Ordinal) || fileName.Contains(":", StringComparison.Ordinal))
+            if (fileName.Contains('/', StringComparison.Ordinal) || fileName.Contains('\\', StringComparison.Ordinal) || fileName.Contains('~', StringComparison.Ordinal) || fileName.Contains(':', StringComparison.Ordinal))
             {
                 throw new ArgumentException("Invalid file name");
             }

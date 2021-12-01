@@ -34,6 +34,9 @@
         private static readonly RandomGenerator RandomGenerator = new RandomGenerator();
         private static readonly TimeSpan GameValidity = TimeSpan.FromHours(2);
 
+        private static readonly ReasonableStringChecker StringCheckerForPlayerName = new ReasonableStringChecker().AllowMaxLength(20).AllowAllReasonableCharacters();
+        private static readonly ReasonableStringChecker StringCheckerForFileName = new ReasonableStringChecker().AllowMaxLength(20).AllowLowercaseLetters().AllowNumbers().AllowAdditionalCharacters(new[] { '_', '-', '.', '@' });
+
         private readonly ILogger<GameController> logger;
         private readonly IHubContext<GameHub>? hubContext;
         private readonly StorageMain storage;
@@ -86,18 +89,7 @@
         [Route("games/{gameId}/join")]
         public void JoinGame(string gameId, [FromBody] string playerName)
         {
-            if (playerName.Length > 16)
-            {
-                throw new ArgumentException("Player name too long");
-            }
-
-            if (playerName.Contains('\r', StringComparison.Ordinal) || playerName.Contains('\n', StringComparison.Ordinal) || playerName.Contains('\t', StringComparison.Ordinal))
-            {
-                throw new ArgumentException("Invalid character in player name");
-            }
-
-            playerName = playerName.Trim();
-            if (string.IsNullOrWhiteSpace(playerName))
+            if (!StringCheckerForPlayerName.Check(playerName))
             {
                 throw new ArgumentException("Invalid player name");
             }
@@ -647,7 +639,7 @@
 
         private static void CheckFileName(string fileName)
         {
-            if (!new Regex(@"^[a-z0-9_\-\.@]+$").IsMatch(fileName))
+            if (!StringCheckerForFileName.Check(fileName))
             {
                 throw new ArgumentException("Invalid file name");
             }

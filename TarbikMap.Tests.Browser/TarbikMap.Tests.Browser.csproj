@@ -31,4 +31,8 @@
     <PackageReference Include="Selenium.Support" Version="4.0.0-rc1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TarbikMap.Common\TarbikMap.Common.csproj" />
+  </ItemGroup>
+
 </Project>

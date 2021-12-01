@@ -10,6 +10,7 @@ namespace TarbikMap.Tests.Browser
     using OpenQA.Selenium.Chrome;
     using OpenQA.Selenium.Interactions;
     using OpenQA.Selenium.Remote;
+    using TarbikMap.Common;
 
     internal class DriverWrapper : IDisposable
     {
@@ -117,22 +118,16 @@ namespace TarbikMap.Tests.Browser
 
         private static WebDriver CreateDriver(DriverOptions options)
         {
-            string? fromEnv = Environment.GetEnvironmentVariable("TARBIKMAP_SELENIUM_URL");
-            if (fromEnv != null)
-            {
-                return new RemoteWebDriver(new Uri(fromEnv), options);
-            }
-            else
-            {
-                return new ChromeDriver((ChromeOptions)options);
-            }
+            string seleniumUrl = EnvironmentVariables.GetValue("TARBIKMAP_SELENIUM_URL");
+
+            return new RemoteWebDriver(new Uri(seleniumUrl), options);
         }
 
         private static Uri GetBaseAddress()
         {
-            string? fromEnv = Environment.GetEnvironmentVariable("TARBIKMAP_APP_URL");
+            string appUrl = EnvironmentVariables.GetValue("TARBIKMAP_APP_URL");
 
-            return fromEnv != null ? new Uri(fromEnv) : new Uri("https://localhost:5001");
+            return new Uri(appUrl);
         }
 
         private void WithRetries(Action action)
@@ -175,8 +170,7 @@ namespace TarbikMap.Tests.Browser
             var screenshot = ((ITakesScreenshot)this.driver).GetScreenshot();
             string fileName = $"s_{GetTestMethodName()}_{this.x}_{this.y}_{name}.png";
 
-            string? fromEnv = Environment.GetEnvironmentVariable("TARBIKMAP_SCREENSHOTS_DIRECTORY");
-            string screenshotsDirectory = fromEnv != null ? fromEnv : "screenshots";
+            string screenshotsDirectory = EnvironmentVariables.GetValue("TARBIKMAP_SCREENSHOTS_DIRECTORY");
 
             Directory.CreateDirectory(screenshotsDirectory);
             screenshot.SaveAsFile(Path.Combine(screenshotsDirectory, fileName), ScreenshotImageFormat.Png);

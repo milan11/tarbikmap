@@ -4,29 +4,25 @@ namespace TarbikMap
     using System.Collections.Generic;
     using System.IO;
     using System.Text.Json;
-    using System.Text.RegularExpressions;
+    using TarbikMap.Common;
 
     public class EnvironmentConfig
     {
+        private static readonly ReasonableStringChecker StringCheckerForEnvironmentName = new ReasonableStringChecker().AllowMaxLength(20).AllowLowercaseLetters().AllowNumbers();
+
         private string environment;
         private Dictionary<string, string> privateConfigValues;
 
         public EnvironmentConfig()
         {
-            string? fromEnv = Environment.GetEnvironmentVariable("TARBIKMAP_ENVIRONMENT");
-            if (!string.IsNullOrEmpty(fromEnv))
-            {
-                if (!new Regex(@"^[a-z0-9_]+$").IsMatch(fromEnv))
-                {
-                    throw new ArgumentException("Invalid environment name: " + fromEnv);
-                }
+            var environmentName = EnvironmentVariables.GetValue("TARBIKMAP_ENVIRONMENT");
 
-                this.environment = fromEnv;
-            }
-            else
+            if (!StringCheckerForEnvironmentName.Check(environmentName))
             {
-                this.environment = "development";
+                throw new ArgumentException("Invalid environment name: " + environmentName);
             }
+
+            this.environment = environmentName;
 
             this.privateConfigValues = this.LoadPrivateConfigValues();
         }

@@ -221,13 +221,14 @@ export class GamePlayerSelection extends Component<Props, State> {
                       className="btn"
                       automaticallyResetLoading={false}
                       onClick={async () => {
-                        setCookie("player_name", btoa(encodeURIComponent(this.state.playerName)), 365);
-                        const response = await fetch("games/" + encodeURIComponent(this.props.match.params.gameId) + "/join", {
+                        const playerName = this.state.playerName.trim();
+                        setCookie("player_name", btoa(encodeURIComponent(playerName)), 365);
+                        await fetch("games/" + encodeURIComponent(this.props.match.params.gameId) + "/join", {
                           method: "POST",
                           headers: {
                             "Content-Type": "application/json",
                           },
-                          body: JSON.stringify(this.state.playerName),
+                          body: JSON.stringify(playerName),
                         });
                       }}
                     />
