@@ -15,6 +15,8 @@ namespace TarbikMap.Common.Downloader
         {
             this.orig = orig;
             this.cachePath = cachePath;
+
+            Directory.CreateDirectory(cachePath);
         }
 
         public async Task<byte[]> HttpGet(Uri url)
