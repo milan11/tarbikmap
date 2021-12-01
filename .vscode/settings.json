@@ -1,12 +1,14 @@
 {
   "editor.formatOnSave": true,
   "files.exclude": {
-    "**/obj": true
+    "**/obj": true,
+    "_download_cache/": true
   },
   "files.watcherExclude": {
-    "**/bin": true
+    "**/bin": true,
+    "_download_cache/": true
   },
-  "dotnetCoreExplorer.searchpatterns": ["TarbikMap.Tests/bin/Debug/**/TarbikMap.Tests.dll", "TarbikMap.Tests.Browser/bin/Debug/**/TarbikMap.Tests.Browser.dll"],
+  "dotnetCoreExplorer.searchpatterns": ["TarbikMap.Tests/bin/Debug/*/TarbikMap.Tests.dll", "TarbikMap.Tests.Browser/bin/Debug/*/TarbikMap.Tests.Browser.dll"],
   "html.format.wrapLineLength": 200,
   "editor.wordWrapColumn": 200,
   "prettier.printWidth": 200,
