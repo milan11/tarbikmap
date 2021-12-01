@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  main:
+    build:
+      context: .
+    volumes:
+      - ..:/workspace:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    environment:
+      - TARBIKMAP_ENVIRONMENT=development
+      - TARBIKMAP_SELENIUM_URL=http://selenium:4444
+      - TARBIKMAP_APP_URL=https://main:5000
+      - TARBIKMAP_SCREENSHOTS_DIRECTORY=screenshots
+
+  selenium:
+    image: selenium/standalone-chrome:4.0.0-rc-2-prerelease-20210916
+    restart: unless-stopped
+    environment:
+      - SE_NODE_MAX_SESSIONS=20
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    shm_size: "2gb"
