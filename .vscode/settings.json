@@ -10,5 +10,5 @@
   "html.format.wrapLineLength": 200,
   "editor.wordWrapColumn": 200,
   "prettier.printWidth": 200,
-  "appService.deploySubpath": "TarbikMap/bin/Release/netcoreapp5.0/publish"
+  "appService.deploySubpath": "TarbikMap/bin/Release/netcoreapp6.0/publish"
 }

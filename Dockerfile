@@ -21,7 +21,7 @@ COPY TarbikMap/ClientApp/ .
 RUN GENERATE_SOURCEMAP=false npm run build
 
 ###
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:6.0.100 AS build-dotnet
 
 WORKDIR /app
 COPY TarbikMap.Common/TarbikMap.Common.csproj TarbikMap.Common/
@@ -82,7 +82,7 @@ WORKDIR /app/TarbikMap.DataGetting.WikiDataClasses
 RUN dotnet build -c Release -o out
 
 ###
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS out-app
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.0 AS out-app
 
 RUN apt-get update && apt-get install -y libgdiplus
 
@@ -106,7 +106,7 @@ COPY TarbikMap.Resources /app/TarbikMap.Resources
 ENTRYPOINT ["/bin/sh", "-c" , "zip -r /out/TarbikMap_codeOnly.zip . -x TarbikMap.Resources/\\* && zip -r /out/TarbikMap_resourcesOnly.zip TarbikMap.Resources"]
 
 ###
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS out-tests
+FROM mcr.microsoft.com/dotnet/sdk:6.0.100 AS out-tests
 
 WORKDIR /app
 COPY --from=build-dotnet /app/TarbikMap.Tests/out/ .
@@ -115,7 +115,7 @@ COPY TarbikMap.Resources /app/TarbikMap.Resources
 ENTRYPOINT ["dotnet", "vstest", "TarbikMap.Tests.dll", "--logger:trx;LogFileName=/out/unit_tests.xml"]
 
 ###
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS out-tests-browser
+FROM mcr.microsoft.com/dotnet/sdk:6.0.100 AS out-tests-browser
 
 WORKDIR /app
 COPY --from=build-dotnet /app/TarbikMap.Tests.Browser/out/ .

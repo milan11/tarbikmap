@@ -39,7 +39,7 @@ namespace TarbikMap.Tests
 
                 Assert.Throws<InvalidOperationException>(() => controller.StartGame(gameId));
 
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.False(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Null(state.TotalTasks);
@@ -63,7 +63,7 @@ namespace TarbikMap.Tests
 
             {
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_observer;
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.False(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Null(state.TotalTasks);
@@ -81,7 +81,7 @@ namespace TarbikMap.Tests
 
             {
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_observer;
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -101,7 +101,7 @@ namespace TarbikMap.Tests
                 Assert.Throws<InvalidOperationException>(() => controller.CompleteTask(gameId, 2));
                 controller.ProvideAnswer(gameId, 0, new ProvidedAnswerDTO(1, 1));
 
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -117,7 +117,7 @@ namespace TarbikMap.Tests
             {
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_player2;
 
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -132,7 +132,7 @@ namespace TarbikMap.Tests
 
             {
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_observer;
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -149,7 +149,7 @@ namespace TarbikMap.Tests
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_player2;
                 controller.ProvideAnswer(gameId, 0, new ProvidedAnswerDTO(2, 2));
 
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -164,7 +164,7 @@ namespace TarbikMap.Tests
 
             {
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_observer;
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -183,7 +183,7 @@ namespace TarbikMap.Tests
                 controller.CompleteTask(gameId, 0);
                 Assert.Throws<InvalidOperationException>(() => controller.CompleteTask(gameId, 0));
 
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -199,7 +199,7 @@ namespace TarbikMap.Tests
             {
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_player2;
 
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(0, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -219,7 +219,7 @@ namespace TarbikMap.Tests
                 controller.CompleteTask(gameId, 0);
                 Assert.Throws<InvalidOperationException>(() => controller.CompleteTask(gameId, 0));
 
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(1, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -234,7 +234,7 @@ namespace TarbikMap.Tests
 
             {
                 controller.ControllerContext.HttpContext.Request.Cookies = cookies_observer;
-                var state = gameStateGetter.GetGameState(gameId, controller.ControllerContext.HttpContext.Request.Cookies["session_key"]);
+                var state = gameStateGetter.GetGameState(gameId, GetSessionKeyOrNull(controller));
                 Assert.True(state.Started);
                 Assert.Equal(1, state.TasksCompleted);
                 Assert.Equal(5, state.TotalTasks);
@@ -243,6 +243,20 @@ namespace TarbikMap.Tests
                 Assert.Equal(2, state.Players.Count);
                 Assert.Null(state.CurrentTaskCompleted);
                 Assert.Null(state.CurrentPlayerIndex);
+            }
+        }
+
+        private static string? GetSessionKeyOrNull(GameController controller)
+        {
+            var cookies = controller.ControllerContext.HttpContext.Request.Cookies;
+
+            if (cookies.TryGetValue("session_key", out string? result))
+            {
+                return result!;
+            }
+            else
+            {
+                return null;
             }
         }
 
