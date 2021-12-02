@@ -2,6 +2,8 @@
 
 Game for 1 to 20 players about guessing locations on a map. The player with the nearest guess gets the most points.
 
+![Video](./video.gif)
+
 ## Configuration:
 
 - some game types use external APIs - specify your API keys in **TarbikMap/config/production/private/values.json**
