@@ -8,7 +8,7 @@
     "terminal.integrated.shell.linux": "/bin/bash"
   },
 
-  "extensions": ["ms-dotnettools.csharp", "esbenp.prettier-vscode", "derivitec-ltd.vscode-dotnet-adapter"],
+  "extensions": ["ms-dotnettools.csharp", "esbenp.prettier-vscode", "derivitec-ltd.vscode-dotnet-adapter", "streetsidesoftware.code-spell-checker"],
 
   "updateContentCommand": "find . -name *.csproj -exec dotnet restore {} \\;",
   "postCreateCommand": "dotnet dev-certs https",
