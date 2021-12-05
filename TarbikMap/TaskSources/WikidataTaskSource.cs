@@ -135,9 +135,27 @@ namespace TarbikMap.TaskSources
 
                                     string imageNameMd5 = sb.ToString();
 
-                                    Uri imageUrl = new Uri($"https://upload.wikimedia.org/wikipedia/commons/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}");
+                                    string imageUrlStr;
 
-                                    taskImages.Add(new TaskImage(TaskImage.AccessType.HTTP, imageUrl));
+                                    string extension = ExtractExtension(imageName);
+                                    if (extension == "PDF")
+                                    {
+                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}/page1-{Constants.ImageSize}px-{imageName}.jpg";
+                                    }
+                                    else if (extension == "WEBP")
+                                    {
+                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}/{Constants.ImageSize}px-{imageName}.jpg";
+                                    }
+                                    else if (extension == "SVG" || extension == "XCF")
+                                    {
+                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}/{Constants.ImageSize}px-{imageName}.png";
+                                    }
+                                    else
+                                    {
+                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}";
+                                    }
+
+                                    taskImages.Add(new TaskImage(TaskImage.AccessType.HTTP, new Uri(imageUrlStr)));
 
                                     GameTask task = new GameTask(
                                         new TaskQuestion(taskImages, envelope.MinY, envelope.MaxY, envelope.MinX, envelope.MaxX),
@@ -152,6 +170,13 @@ namespace TarbikMap.TaskSources
             }
 
             return result;
+        }
+
+        private static string ExtractExtension(string str)
+        {
+            int dotPos = str.LastIndexOf('.');
+            string ext = str.Substring(dotPos + 1).ToUpperInvariant();
+            return ext;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA5351", Justification = "External API wants this")]

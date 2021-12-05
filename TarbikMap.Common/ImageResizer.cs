@@ -17,7 +17,7 @@ namespace TarbikMap.Common
                 using (var origImage = Image.FromStream(ms_orig))
                 {
                     Rotate(origImage);
-                    using (var newImage = ScaleImage(origImage, 1000, 1000))
+                    using (var newImage = ScaleImage(origImage, Constants.ImageSize, Constants.ImageSize))
                     {
                         using (var ms_new = new MemoryStream())
                         {
