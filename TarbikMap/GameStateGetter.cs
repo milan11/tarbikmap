@@ -71,6 +71,7 @@ namespace TarbikMap
                     new GameConfigurationDTO(
                         game.Configuration.Type,
                         game.Configuration.Area,
+                        game.Configuration.MapLabels,
                         game.Configuration.TasksCount,
                         game.Configuration.AnsweringTimeLimitSeconds,
                         game.Configuration.CompletingTimeLimitSeconds),

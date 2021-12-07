@@ -37,7 +37,7 @@ export class StylesJson {
     return (lat_rad * 180.0) / Math.PI;
   }
 
-  getPossibleStyles(zoom: number, map_min_lat: number, map_max_lat: number, map_min_lon: number, map_max_lon: number) {
+  getPossibleStyleUrls(zoom: number, map_min_lat: number, map_max_lat: number, map_min_lon: number, map_max_lon: number) {
     const found: { styleUrl: string; forZoom: number }[] = [];
 
     this.json.styles.forEach((style) => {

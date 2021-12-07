@@ -17,12 +17,14 @@ type Props = {
   onPrepareForSelecting: (data: PrepareForSelecting_Data) => void;
   onPrepareForShowingResults: (data: PrepareForShowingResults_Data) => void;
   onShowGeometry: (data: ShowGeometry_Data) => void;
+  onShowMapLabels: (mapLabelsShown: boolean, allowChange: boolean) => void;
   onPrepareClean: () => void;
   selectedLocation: Point | null;
 };
 type State = {
   connection: HubConnection | null;
   geometryShownForArea: string | null;
+  mapLabelsShown: boolean | null;
   gameState?: GameStateDTO;
 };
 
@@ -30,7 +32,7 @@ export class Game extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = { connection: null, geometryShownForArea: null };
+    this.state = { connection: null, geometryShownForArea: null, mapLabelsShown: null };
   }
 
   componentDidMount() {
@@ -54,6 +56,16 @@ export class Game extends Component<Props, State> {
             const geometry = await response.json();
             this.props.onShowGeometry({ geometry: geometry });
           }
+        }
+      );
+    }
+    if (this.state.gameState && this.state.gameState.configuration.mapLabels !== this.state.mapLabelsShown) {
+      this.setState(
+        {
+          mapLabelsShown: this.state.gameState.configuration.mapLabels,
+        },
+        () => {
+          this.props.onShowMapLabels(this.state.gameState!.configuration.mapLabels, !this.gameEnded(this.state.gameState!));
         }
       );
     }
@@ -111,7 +123,7 @@ export class Game extends Component<Props, State> {
       return <GamePlayerSelection match={this.props.match} gameState={gameState} />;
     }
 
-    if (gameState.tasksCompleted < gameState.totalTasks!) {
+    if (!this.gameEnded(gameState)) {
       if (gameState.correctAnswers!.length === gameState.tasksCompleted + 1) {
         return <GameTaskResults match={this.props.match} gameState={gameState} onPrepareForShowingResults={this.props.onPrepareForShowingResults} />;
       } else {
@@ -130,5 +142,9 @@ export class Game extends Component<Props, State> {
     }
 
     return null;
+  }
+
+  gameEnded(gameState: GameStateDTO) {
+    return gameState.tasksCompleted === gameState.totalTasks!;
   }
 }

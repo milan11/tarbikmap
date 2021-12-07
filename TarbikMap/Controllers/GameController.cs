@@ -78,6 +78,7 @@
             var createdGameId = this.CreateGameInternal(new GameConfiguration(
                 (await this.taskSource.Search(string.Empty).ConfigureAwait(false))[0].Key,
                 (await this.areaSource.Search(string.Empty).ConfigureAwait(false))[0].Key,
+                true,
                 DefaultTasksCount,
                 DefaultAnsweringTimeLimitSeconds,
                 DefaultCompletingTimeLimitSeconds));
@@ -291,6 +292,11 @@
                 {
                     game.Configuration.Area = configuration.Area;
                     this.ReloadAreaLabel(game, gameId);
+                }
+
+                if (configuration.MapLabels != null)
+                {
+                    game.Configuration.MapLabels = configuration.MapLabels.Value;
                 }
 
                 if (configuration.TasksCount != null)

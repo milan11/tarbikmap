@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { getCookie, setCookie } from "../cookieUtils";
-import { GameAreaSearch } from "./GameAreaSearch";
 import { GameTypeSelection } from "./GameTypeSelection";
+import { GameAreaSearch } from "./GameAreaSearch";
+import { GameMapStyle } from "./GameMapStyle";
 import { GameSettings } from "./GameSettings";
 import { ButtonWithLoading } from "../ButtonWithLoading";
 
@@ -18,6 +19,7 @@ type State = {
   playerName: string;
   gameTypeSelectionShown: boolean;
   gameAreaSearchShown: boolean;
+  mapStyleShown: boolean;
   settingsShown: boolean;
   detailsShown: boolean;
   confirmingStart: boolean;
@@ -29,8 +31,9 @@ export class GamePlayerSelection extends Component<Props, State> {
 
     this.state = {
       playerName: decodeURIComponent(atob(getCookie("player_name"))),
-      gameAreaSearchShown: false,
       gameTypeSelectionShown: false,
+      gameAreaSearchShown: false,
+      mapStyleShown: false,
       settingsShown: false,
       detailsShown: false,
       confirmingStart: false,
@@ -47,7 +50,7 @@ export class GamePlayerSelection extends Component<Props, State> {
       }
 
       if (prevProps.gameState.starting !== this.props.gameState.starting) {
-        this.setState({ gameAreaSearchShown: false, gameTypeSelectionShown: false, settingsShown: false, confirmingStart: false });
+        this.setState({ gameTypeSelectionShown: false, gameAreaSearchShown: false, mapStyleShown: false, settingsShown: false, confirmingStart: false });
       }
     }
   }
@@ -93,6 +96,28 @@ export class GamePlayerSelection extends Component<Props, State> {
                 body: JSON.stringify({
                   area: key,
                 }),
+              });
+            });
+          }}
+        />
+      );
+    }
+
+    if (this.state.mapStyleShown) {
+      return (
+        <GameMapStyle
+          configuration={this.props.gameState.configuration}
+          onBack={() => {
+            this.setState({ mapStyleShown: false }, () => {});
+          }}
+          onSelect={(configuration) => {
+            this.setState({ mapStyleShown: false }, () => {
+              fetch("games/" + encodeURIComponent(this.props.match.params.gameId) + "/configuration", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(configuration),
               });
             });
           }}
@@ -175,6 +200,21 @@ export class GamePlayerSelection extends Component<Props, State> {
             className="collection-item"
           >
             <span className="badge">{this.props.gameState.loadedAreaLabel}</span>Area
+          </a>
+          {/* eslint-disable-next-line */}
+          <a
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              if (this.props.gameState.starting) {
+                return;
+              }
+              this.setState({
+                mapStyleShown: true,
+              });
+            }}
+            className="collection-item"
+          >
+            <span className="badge">{this.props.gameState.configuration.mapLabels ? "With Labels" : "Without Labels"}</span>Map Style
           </a>
           {/* eslint-disable-next-line */}
           <a

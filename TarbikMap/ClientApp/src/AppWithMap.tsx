@@ -30,8 +30,11 @@ type State = {
       }[]
     | null;
   geometryShown: Position[][] | null;
-  style: string | null;
   stylesJson: StylesJson | null;
+  currentStyleUrl: string | null;
+  downloadedStyle: string | null;
+  deserializedStylePostProcessed: any | null;
+  mapLabelsShown: boolean | null;
 };
 
 export class AppWithMap extends Component<Props, State> {
@@ -50,8 +53,11 @@ export class AppWithMap extends Component<Props, State> {
         longitude: 17.112726,
         zoom: 8,
       },
-      style: null,
       stylesJson: null,
+      currentStyleUrl: null,
+      downloadedStyle: null,
+      deserializedStylePostProcessed: null,
+      mapLabelsShown: null,
     };
   }
 
@@ -74,10 +80,38 @@ export class AppWithMap extends Component<Props, State> {
   }
 
   updateStyle() {
-    const possibleStyles = this.getPossibleStyles();
-    if (this.state.style === null || !possibleStyles.includes(this.state.style)) {
-      this.setState({ style: possibleStyles[0] });
+    const possibleStyleUrls = this.getPossibleStyleUrls();
+    if (this.state.currentStyleUrl === null || !possibleStyleUrls.includes(this.state.currentStyleUrl)) {
+      const styleUrl = possibleStyleUrls[0];
+      this.setState({ currentStyleUrl: styleUrl }, async () => {
+        const response = await fetch(styleUrl);
+        const json = await response.text();
+        if (this.state.currentStyleUrl === styleUrl) {
+          this.setState({ downloadedStyle: json }, () => {
+            if (this.state.mapLabelsShown !== null) {
+              this.postProcessStyle();
+            }
+          });
+        }
+      });
     }
+  }
+
+  postProcessStyle() {
+    const postProcessed = JSON.parse(this.state.downloadedStyle!);
+    if (!this.state.mapLabelsShown) {
+      this.removeLabels(postProcessed);
+    }
+
+    this.setState({ deserializedStylePostProcessed: postProcessed });
+  }
+
+  removeLabels(deserializedStyle: any) {
+    deserializedStyle.layers.forEach((layer: any) => {
+      if (layer.layout && layer.layout["text-field"]) {
+        layer.layout["text-field"] = "";
+      }
+    });
   }
 
   render() {
@@ -104,7 +138,7 @@ export class AppWithMap extends Component<Props, State> {
         width="100%"
         height="100%"
         onViewportChange={(nextViewport: Viewport) => this.setViewport(nextViewport)}
-        mapStyle={this.state.style}
+        mapStyle={this.state.deserializedStylePostProcessed}
         onClick={(event) => {
           if (this.state.selectableLocation) {
             this.setState({
@@ -124,7 +158,7 @@ export class AppWithMap extends Component<Props, State> {
     );
   }
 
-  getPossibleStyles() {
+  getPossibleStyleUrls() {
     const zoom = Math.floor(this.state.viewport.zoom);
     const mapBounds = this.mapRef?.getMap().getBounds();
 
@@ -133,7 +167,7 @@ export class AppWithMap extends Component<Props, State> {
     const map_min_lon = mapBounds.getWest();
     const map_max_lon = mapBounds.getEast();
 
-    return this.state.stylesJson!.getPossibleStyles(zoom, map_min_lat, map_max_lat, map_min_lon, map_max_lon);
+    return this.state.stylesJson!.getPossibleStyleUrls(zoom, map_min_lat, map_max_lat, map_min_lon, map_max_lon);
   }
 
   getAdditionalSources() {
@@ -312,6 +346,18 @@ export class AppWithMap extends Component<Props, State> {
     this.setState({ geometryShown: data.geometry.lines.map((l) => l.points.map(this.pointToPosition)) });
   }
 
+  showMapLabels(mapLabelsShown: boolean, allowChange: boolean) {
+    if (allowChange || this.state.mapLabelsShown === null) {
+      if (this.state.mapLabelsShown !== mapLabelsShown) {
+        this.setState({ mapLabelsShown: mapLabelsShown }, () => {
+          if (this.state.downloadedStyle) {
+            this.postProcessStyle();
+          }
+        });
+      }
+    }
+  }
+
   hideGeometry() {
     this.setState({ geometryShown: null });
   }
@@ -319,7 +365,18 @@ export class AppWithMap extends Component<Props, State> {
   renderInner() {
     return (
       <div>
-        <Route exact path={["/", "/join", "/about"]} render={(props) => <Home {...props} onPrepareClean={() => this.prepareClean()} onHideGeometry={() => this.hideGeometry()} />} />
+        <Route
+          exact
+          path={["/", "/join", "/about"]}
+          render={(props) => (
+            <Home
+              {...props}
+              onPrepareClean={() => this.prepareClean()}
+              onHideGeometry={() => this.hideGeometry()}
+              onShowMapLabels={(mapLabelsShown, allowChange) => this.showMapLabels(mapLabelsShown, allowChange)}
+            />
+          )}
+        />
         <Route
           path="/game/:gameId"
           render={(props) => (
@@ -329,6 +386,7 @@ export class AppWithMap extends Component<Props, State> {
               onPrepareForShowingResults={(data) => this.prepareForShowingResults(data)}
               onPrepareClean={() => this.prepareClean()}
               onShowGeometry={(data) => this.showGeometry(data)}
+              onShowMapLabels={(mapLabelsShown, allowChange) => this.showMapLabels(mapLabelsShown, allowChange)}
               selectedLocation={this.state.selectedLocation}
             />
           )}

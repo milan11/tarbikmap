@@ -7,6 +7,8 @@ namespace TarbikMap.DTO
 
         public string? Area { get; set; }
 
+        public bool? MapLabels { get; set; }
+
         public int? TasksCount { get; set; }
 
         public int? AnsweringTimeLimitSeconds { get; set; }

@@ -7,6 +7,7 @@ import { HomeNew } from "./HomeNew";
 type Props = {
   onPrepareClean: () => void;
   onHideGeometry: () => void;
+  onShowMapLabels: (mapLabelsShown: boolean, allowChange: boolean) => void;
 };
 type State = {};
 
@@ -14,6 +15,7 @@ export class Home extends Component<Props, State> {
   componentDidMount() {
     this.props.onPrepareClean();
     this.props.onHideGeometry();
+    this.props.onShowMapLabels(true, false);
   }
 
   render() {
