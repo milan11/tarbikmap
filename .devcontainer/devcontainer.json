@@ -5,7 +5,8 @@
   "workspaceFolder": "/workspace",
 
   "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash"
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "workbench.startupEditor": "readme"
   },
 
   "extensions": ["ms-dotnettools.csharp", "esbenp.prettier-vscode", "derivitec-ltd.vscode-dotnet-adapter", "streetsidesoftware.code-spell-checker"],

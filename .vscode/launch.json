@@ -5,61 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "data_getting_wiki_data",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build_data_getting_wiki_data",
-      "program": "${workspaceFolder}/TarbikMap.DataGetting.WikiData/bin/Debug/netcoreapp6.0/TarbikMap.DataGetting.WikiData",
-      "args": [],
-      "cwd": "${workspaceFolder}",
-      "stopAtEntry": false,
-      "console": "internalConsole"
-    },
-    {
-      "name": "data_getting_wiki_data_classes",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build_data_getting_wiki_data_classes",
-      "program": "${workspaceFolder}/TarbikMap.DataGetting.WikiDataClasses/bin/Debug/netcoreapp6.0/TarbikMap.DataGetting.WikiDataClasses",
-      "args": [],
-      "cwd": "${workspaceFolder}",
-      "stopAtEntry": false,
-      "console": "internalConsole"
-    },
-    {
-      "name": "tests_browser_local",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build_tests_browser",
-      "program": "${workspaceFolder}/TarbikMap.Tests.Browser/bin/Debug/netcoreapp6.0/TarbikMap.Tests.Browser",
-      "args": ["https://localhost:5001"],
-      "cwd": "${workspaceFolder}",
-      "stopAtEntry": false,
-      "console": "internalConsole"
-    },
-    {
-      "name": "tests_browser_azure",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build_tests_browser",
-      "program": "${workspaceFolder}/TarbikMap.Tests.Browser/bin/Debug/netcoreapp6.0/TarbikMap.Tests.Browser",
-      "args": ["https://tarbikmap.azurewebsites.net"],
-      "cwd": "${workspaceFolder}",
-      "stopAtEntry": false,
-      "console": "internalConsole"
-    },
-    {
-      "name": "tests_tasks",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build_tests_tasks",
-      "program": "${workspaceFolder}/TarbikMap.Tests.Tasks/bin/Debug/netcoreapp6.0/TarbikMap.Tests.Tasks",
-      "args": [],
-      "cwd": "${workspaceFolder}",
-      "stopAtEntry": false,
-      "console": "internalConsole"
-    },
-    {
       "name": "web",
       "type": "coreclr",
       "request": "launch",
@@ -80,6 +25,39 @@
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/Views"
       }
+    },
+    {
+      "name": "tests_tasks",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build_tests_tasks",
+      "program": "${workspaceFolder}/TarbikMap.Tests.Tasks/bin/Debug/netcoreapp6.0/TarbikMap.Tests.Tasks",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "internalConsole"
+    },
+    {
+      "name": "data_getting_wiki_data",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build_data_getting_wiki_data",
+      "program": "${workspaceFolder}/TarbikMap.DataGetting.WikiData/bin/Debug/netcoreapp6.0/TarbikMap.DataGetting.WikiData",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "internalConsole"
+    },
+    {
+      "name": "data_getting_wiki_data_classes",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build_data_getting_wiki_data_classes",
+      "program": "${workspaceFolder}/TarbikMap.DataGetting.WikiDataClasses/bin/Debug/netcoreapp6.0/TarbikMap.DataGetting.WikiDataClasses",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "internalConsole"
     },
     {
       "name": ".NET Core Attach",
