@@ -102,6 +102,7 @@ WORKDIR /app
 COPY --from=build-dotnet /app/TarbikMap/out/ .
 COPY --from=build-node /TarbikMap/ClientApp/build ./ClientApp/build
 COPY TarbikMap.Resources /app/TarbikMap.Resources
+RUN mkdir /out
 
 ENTRYPOINT ["/bin/sh", "-c" , "zip -r /out/TarbikMap_codeOnly.zip . -x TarbikMap.Resources/\\* && zip -r /out/TarbikMap_resourcesOnly.zip TarbikMap.Resources"]
 
