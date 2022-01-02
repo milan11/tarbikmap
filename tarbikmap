@@ -150,5 +150,29 @@ if [ $command = "stop" ] ; then
   exit 0
 fi
 
+if [ $command = "jenkins-start" ] ; then
+  docker build -t tarbikmap-jenkins jenkins
+  docker run -d -p 39443:8080 -v /var/run/docker.sock:/var/run/docker.sock -v tarbikmap_jenkins_home:/var/jenkins_home --name tarbikmap-jenkins tarbikmap-jenkins
+
+  exit 0
+fi
+
+if [ $command = "jenkins-stop" ] ; then
+  set +e
+  docker stop tarbikmap-jenkins
+  docker rm tarbikmap-jenkins
+  set -e
+
+  exit 0
+fi
+
+if [ $command = "jenkins-delete-workspace" ] ; then
+  set +e
+  docker volume rm tarbikmap_jenkins_home
+  set -e
+
+  exit 0
+fi
+
 echo "Invalid command: $command"
 exit 1

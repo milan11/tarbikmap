@@ -1,0 +1,30 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+       - id: admin
+         password: a1
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+jobs:
+  - script: >
+      pipelineJob('tarbikmap') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/milan11/tarbikmap.git')
+                }
+                branch('*/master')
+              }
+            }
+            lightweight()
+          }
+        }
+      }
+unclassified:
+  location:
+    url: http://localhost:39443/
