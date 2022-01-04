@@ -16,5 +16,9 @@ namespace TarbikMap.TaskSources
         Task<GameTask> CreateTask(string gameTypeKey, string areaKey, Geometry geometry, IList<GameTask> existingTasks);
 
         Task<List<GameTask>> CreateTasks(string gameTypeKey, string areaKey, Geometry geometry, int maxCount);
+
+        Task<byte[]> GetImageData(string gameTypeKey, string imageKey);
+
+        Task<string> GetImageAttribution(string gameTypeKey, string imageKey);
     }
 }

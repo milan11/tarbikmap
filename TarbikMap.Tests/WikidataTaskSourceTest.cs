@@ -4,6 +4,7 @@ namespace TarbikMap.Tests
     using System.Linq;
     using System.Threading.Tasks;
     using TarbikMap.AreaSources;
+    using TarbikMap.Common.Downloader;
     using TarbikMap.TaskSources;
     using Xunit;
 
@@ -88,7 +89,7 @@ namespace TarbikMap.Tests
 
         private static async Task Test(string areaQuery, string taskQuery, int? expectedTasksCount, string[]? tasksShouldContain, string[]? tasksShouldNotContain)
         {
-            ITaskSource taskSource = new WikidataTaskSource();
+            ITaskSource taskSource = new WikidataTaskSource(new NoDownloader());
             var gameTypeKey = (await taskSource.Search(taskQuery).ConfigureAwait(false))[0].Key;
 
             IAreaSource areaSource = new NaturalEarthAreaSource();

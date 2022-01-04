@@ -106,9 +106,11 @@ namespace TarbikMap.TaskSources
                 for (int i = 0; i < 4; ++i)
                 {
                     int heading = (initialHeading + (i * 90)) % 360;
-                    Uri imageUrl = new Uri($"https://maps.googleapis.com/maps/api/streetview?size=400x600&pano={selectedItem.Item.PanoId}&heading={heading}&key={this.environmentConfig.GetPrivateConfigValue("GoogleStreetViewStaticApiKey")}");
+                    string imageUrl = $"https://maps.googleapis.com/maps/api/streetview?size=400x600&pano={selectedItem.Item.PanoId}&heading={heading}&key={this.environmentConfig.GetPrivateConfigValue("GoogleStreetViewStaticApiKey")}";
 
-                    images.Add(new TaskImage(TaskImage.AccessType.HTTP, imageUrl));
+                    var taskImage = new TaskImage(imageUrl);
+                    taskImage.CachedImageAttribution = string.Join(" | ", "Google Street View", selectedItem.Item.Copyright);
+                    images.Add(taskImage);
                 }
 
                 string description = string.Empty;
@@ -134,6 +136,16 @@ namespace TarbikMap.TaskSources
         public Task<List<GameTask>> CreateTasks(string gameTypeKey, string areaKey, Geometry geometry, int maxCount)
         {
             throw new InvalidOperationException();
+        }
+
+        public Task<byte[]> GetImageData(string gameTypeKey, string imageKey)
+        {
+            return this.downloader.HttpGet(new Uri(imageKey));
+        }
+
+        public Task<string> GetImageAttribution(string gameTypeKey, string imageKey)
+        {
+            throw new InvalidOperationException("Data should be already cached");
         }
 
         private class FoundItem

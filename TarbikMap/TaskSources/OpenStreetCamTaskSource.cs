@@ -83,9 +83,11 @@ namespace TarbikMap.TaskSources
                 var selectedItem = foundItems.OrderBy(item => CalculationUtils.DistanceBetween(double.Parse(item.Item.Lat, CultureInfo.InvariantCulture), double.Parse(item.Item.Lng, CultureInfo.InvariantCulture), item.QueriedLat, item.QueriedLng)).First();
 
                 var images = new List<TaskImage>();
-                Uri imageUrl = new Uri($"http://openstreetcam.org/{selectedItem.Item.Name}");
+                var imageUrl = $"http://openstreetcam.org/{selectedItem.Item.Name}";
 
-                images.Add(new TaskImage(TaskImage.AccessType.HTTP, imageUrl));
+                var taskImage = new TaskImage(imageUrl);
+                taskImage.CachedImageAttribution = string.Join(" | ", "OpenStreetCam", selectedItem.Item.Username);
+                images.Add(taskImage);
 
                 string description = string.Empty;
 
@@ -101,6 +103,16 @@ namespace TarbikMap.TaskSources
         public Task<List<GameTask>> CreateTasks(string gameTypeKey, string areaKey, Geometry geometry, int maxCount)
         {
             throw new InvalidOperationException();
+        }
+
+        public Task<byte[]> GetImageData(string gameTypeKey, string imageKey)
+        {
+            return this.downloader.HttpGet(new Uri(imageKey));
+        }
+
+        public Task<string> GetImageAttribution(string gameTypeKey, string imageKey)
+        {
+            throw new InvalidOperationException("Data should be already cached");
         }
 
         private class FoundItem

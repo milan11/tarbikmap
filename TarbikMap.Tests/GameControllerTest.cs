@@ -7,6 +7,7 @@ namespace TarbikMap.Tests
     using Microsoft.Extensions.Logging;
     using Moq;
     using TarbikMap.AreaSources;
+    using TarbikMap.Common.Downloader;
     using TarbikMap.Controllers;
     using TarbikMap.DTO;
     using TarbikMap.Storage;
@@ -21,7 +22,7 @@ namespace TarbikMap.Tests
             var logger = new Mock<ILogger<GameController>>();
             var storage = new StorageMain();
             var areaSource = new CommonAreaSource();
-            var taskSource = new WikidataTaskSource();
+            var taskSource = new WikidataTaskSource(new NoDownloader());
             var gameStateGetter = new GameStateGetter(storage, areaSource, taskSource);
             var environmentConfig = new EnvironmentConfig();
             var controller = new GameController(logger.Object, null, storage, areaSource, taskSource, Factories.CreateDownloader(environmentConfig), environmentConfig, gameStateGetter);

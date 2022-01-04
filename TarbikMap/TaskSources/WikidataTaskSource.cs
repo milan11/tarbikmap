@@ -10,6 +10,8 @@ namespace TarbikMap.TaskSources
     using NetTopologySuite.Geometries;
     using NetTopologySuite.Simplify;
     using TarbikMap.Common;
+    using TarbikMap.Common.Downloader;
+    using TarbikMap.DataSources.Wikimedia;
     using TarbikMap.Storage;
     using TarbikMap.Utils;
 
@@ -40,7 +42,14 @@ namespace TarbikMap.TaskSources
             new WikidataGameType("squares", "Squares", new[] { FileNameSquares }, "Places"),
         };
 
+        private IDownloader downloader;
+
         private AsyncCache<List<GameTask>> cacheItemsForArea = new AsyncCache<List<GameTask>>();
+
+        public WikidataTaskSource(IDownloader downloader)
+        {
+            this.downloader = downloader;
+        }
 
         public Task<List<GameType>> Search(string query)
         {
@@ -84,6 +93,58 @@ namespace TarbikMap.TaskSources
             }
         }
 
+        public Task<byte[]> GetImageData(string gameTypeKey, string imageKey)
+        {
+            string imageNameForUrl = imageKey.Replace(' ', '_');
+
+            byte[] hashBytes = Md5ForWikimedia(imageNameForUrl);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                sb.Append(hashBytes[i].ToString("x2", CultureInfo.InvariantCulture));
+            }
+
+            string imageNameMd5 = sb.ToString();
+
+            string imageUrlStr;
+
+            string extension = ExtractExtension(imageNameForUrl);
+            if (extension == "PDF")
+            {
+                imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageNameForUrl}/page1-{Constants.ImageSize}px-{imageNameForUrl}.jpg";
+            }
+            else if (extension == "WEBP")
+            {
+                imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageNameForUrl}/{Constants.ImageSize}px-{imageNameForUrl}.jpg";
+            }
+            else if (extension == "SVG" || extension == "XCF")
+            {
+                imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageNameForUrl}/{Constants.ImageSize}px-{imageNameForUrl}.png";
+            }
+            else
+            {
+                imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageNameForUrl}";
+            }
+
+            return this.downloader.HttpGet(new Uri(imageUrlStr));
+        }
+
+        public async Task<string> GetImageAttribution(string gameTypeKey, string imageKey)
+        {
+            var attribution = await WikimediaApiMain.LoadAttribution(this.downloader, imageKey).ConfigureAwait(false);
+
+            string?[] parts = new string?[]
+            {
+                "Wikimedia Commons",
+                attribution.ArtistHtml != null ? XmlUtils.XmlToString(attribution.ArtistHtml) : null,
+                attribution.LicenseShortName,
+                attribution.LicenseUrl,
+            };
+
+            return string.Join(" | ", parts.Where(part => part != null));
+        }
+
         private static List<GameTask> GetItemsInGeometry(Geometry geometry, WikidataGameType wikidataGameType)
         {
             List<GameTask> result = new List<GameTask>();
@@ -123,39 +184,7 @@ namespace TarbikMap.TaskSources
 
                                     var taskImages = new List<TaskImage>();
 
-                                    string imageName = image.Replace(' ', '_');
-
-                                    byte[] hashBytes = Md5ForWikimedia(imageName);
-
-                                    StringBuilder sb = new StringBuilder();
-                                    for (int i = 0; i < hashBytes.Length; i++)
-                                    {
-                                        sb.Append(hashBytes[i].ToString("x2", CultureInfo.InvariantCulture));
-                                    }
-
-                                    string imageNameMd5 = sb.ToString();
-
-                                    string imageUrlStr;
-
-                                    string extension = ExtractExtension(imageName);
-                                    if (extension == "PDF")
-                                    {
-                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}/page1-{Constants.ImageSize}px-{imageName}.jpg";
-                                    }
-                                    else if (extension == "WEBP")
-                                    {
-                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}/{Constants.ImageSize}px-{imageName}.jpg";
-                                    }
-                                    else if (extension == "SVG" || extension == "XCF")
-                                    {
-                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/thumb/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}/{Constants.ImageSize}px-{imageName}.png";
-                                    }
-                                    else
-                                    {
-                                        imageUrlStr = $"https://upload.wikimedia.org/wikipedia/commons/{imageNameMd5.Substring(0, 1)}/{imageNameMd5.Substring(0, 2)}/{imageName}";
-                                    }
-
-                                    taskImages.Add(new TaskImage(TaskImage.AccessType.HTTP, new Uri(imageUrlStr)));
+                                    taskImages.Add(new TaskImage(image));
 
                                     GameTask task = new GameTask(
                                         new TaskQuestion(taskImages, envelope.MinY, envelope.MaxY, envelope.MinX, envelope.MaxX),

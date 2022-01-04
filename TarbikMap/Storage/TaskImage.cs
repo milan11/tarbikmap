@@ -1,24 +1,16 @@
 namespace TarbikMap.Storage
 {
-    using System;
-
     internal class TaskImage
     {
-        public TaskImage(AccessType access, Uri url)
+        public TaskImage(string imageKey)
         {
-            this.Access = access;
-            this.Url = url;
+            this.ImageKey = imageKey;
         }
 
-        public enum AccessType
-        {
-            HTTP,
-        }
+        public string ImageKey { get; private set; }
 
-        public AccessType Access { get; private set; }
+        public byte[]? CachedImageData { get; set; }
 
-        public Uri Url { get; private set; }
-
-        public byte[]? Cached { get; set; }
+        public string? CachedImageAttribution { get; set; }
     }
 }

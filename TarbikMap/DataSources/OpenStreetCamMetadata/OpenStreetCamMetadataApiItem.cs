@@ -16,5 +16,8 @@ namespace TarbikMap.DataSources.OpenStreetCamMetadata
 
         [JsonPropertyName("date_added")]
         public string DateAdded { get; set; } = null!;
+
+        [JsonPropertyName("username")]
+        public string Username { get; set; } = null!;
     }
 }

@@ -43,7 +43,7 @@ namespace TarbikMap.TaskSources
         public bool IsFinite(string gameTypeKey)
         {
             var sourceAndGameTypeKey = this.SplitGameTypeKey(gameTypeKey);
-            return sourceAndGameTypeKey.Item1.IsFinite(gameTypeKey);
+            return sourceAndGameTypeKey.Item1.IsFinite(sourceAndGameTypeKey.Item2);
         }
 
         public async Task<List<GameType>> Search(string query)
@@ -60,6 +60,18 @@ namespace TarbikMap.TaskSources
             }
 
             return results;
+        }
+
+        public Task<byte[]> GetImageData(string gameTypeKey, string imageKey)
+        {
+            var sourceAndGameTypeKey = this.SplitGameTypeKey(gameTypeKey);
+            return sourceAndGameTypeKey.Item1.GetImageData(sourceAndGameTypeKey.Item2, imageKey);
+        }
+
+        public Task<string> GetImageAttribution(string gameTypeKey, string imageKey)
+        {
+            var sourceAndGameTypeKey = this.SplitGameTypeKey(gameTypeKey);
+            return sourceAndGameTypeKey.Item1.GetImageAttribution(sourceAndGameTypeKey.Item2, imageKey);
         }
 
         private Tuple<ITaskSource, string> SplitGameTypeKey(string gameTypeKey)

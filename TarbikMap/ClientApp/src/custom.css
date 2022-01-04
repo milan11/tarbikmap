@@ -82,6 +82,16 @@ body {
   max-height: 100%;
 }
 
+.imageAttribution {
+  position: absolute;
+  z-index: 25;
+  width: 100%;
+  left: 0;
+  top: 0;
+  background-color: #000;
+  color: #fff;
+}
+
 .nav {
   position: absolute;
   z-index: 25;

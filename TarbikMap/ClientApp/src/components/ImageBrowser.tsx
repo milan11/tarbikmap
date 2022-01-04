@@ -1,10 +1,12 @@
 import React, { Component } from "react";
+import { ImageBrowserAttribution } from "./ImageBrowserAttribution";
 
 type Props = {
   onClick: (() => void) | undefined;
   gameId: string;
   taskIndex: number;
   imagesCount: number;
+  attributionShown: boolean;
 };
 type State = {
   imageIndex: number;
@@ -26,6 +28,7 @@ export class ImageBrowser extends Component<Props, State> {
         className="fullWindow"
         style={this.props.onClick ? { cursor: "pointer" } : undefined}
       />,
+      this.props.attributionShown ? <ImageBrowserAttribution key={this.state.imageIndex} gameId={this.props.gameId} taskIndex={this.props.taskIndex} imageIndex={this.state.imageIndex} /> : null,
       this.props.imagesCount > 1 ? (
         <div
           className="left"

@@ -101,6 +101,7 @@ export class GameTaskAssignment extends Component<Props, State> {
                 }
               : undefined
           }
+          attributionShown={false}
         />,
         <div className="topLeftButtons">
           {this.props.gameState.currentPlayerIndex !== null ? (

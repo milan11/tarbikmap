@@ -86,7 +86,9 @@ namespace TarbikMap.TaskSources
 
                 var images = new List<TaskImage>();
 
-                images.Add(new TaskImage(TaskImage.AccessType.HTTP, new Uri(selectedItem.Item.Url)));
+                var taskImage = new TaskImage(selectedItem.Item.Url);
+                taskImage.CachedImageAttribution = string.Join(" | ", "Flickr", selectedItem.Item.OwnerName);
+                images.Add(taskImage);
 
                 string description = string.Empty;
 
@@ -102,6 +104,16 @@ namespace TarbikMap.TaskSources
         public Task<List<GameTask>> CreateTasks(string gameTypeKey, string areaKey, Geometry geometry, int maxCount)
         {
             throw new InvalidOperationException();
+        }
+
+        public Task<byte[]> GetImageData(string gameTypeKey, string imageKey)
+        {
+            return this.downloader.HttpGet(new Uri(imageKey));
+        }
+
+        public Task<string> GetImageAttribution(string gameTypeKey, string imageKey)
+        {
+            throw new InvalidOperationException("Data should be already cached");
         }
 
         private class FoundItem

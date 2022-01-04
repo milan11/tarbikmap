@@ -51,20 +51,25 @@ namespace TarbikMap
 
             services.AddSingleton<ITaskSource>((serviceProvider) =>
             {
+                var downloader = serviceProvider.GetRequiredService<IDownloader>();
+                var environmentConfig = serviceProvider.GetRequiredService<EnvironmentConfig>();
+
                 return new CompositeTaskSource()
-                    .Add("sw", new StreetviewTaskSource(serviceProvider.GetRequiredService<IDownloader>(), serviceProvider.GetRequiredService<EnvironmentConfig>(), false, false))
-                    .Add("fl", new FlickrTaskSource(serviceProvider.GetRequiredService<IDownloader>(), serviceProvider.GetRequiredService<EnvironmentConfig>()))
-                    .Add("oc", new OpenStreetCamTaskSource(serviceProvider.GetRequiredService<IDownloader>()))
-                    .Add("wd", new WikidataTaskSource())
+                    .Add("sw", new StreetviewTaskSource(downloader, environmentConfig, false, false))
+                    .Add("fl", new FlickrTaskSource(downloader, environmentConfig))
+                    .Add("oc", new OpenStreetCamTaskSource(downloader))
+                    .Add("wd", new WikidataTaskSource(downloader))
                     ;
             });
 
             services.AddSingleton<IAreaSource>((serviceProvider) =>
             {
+                var downloader = serviceProvider.GetRequiredService<IDownloader>();
+
                 return new CachingAreaSource(new CompositeAreaSource()
                     .Add("co", new CommonAreaSource())
                     .Add("ne", new NaturalEarthAreaSource())
-                    .Add("os", new OsmAreaSource(serviceProvider.GetRequiredService<IDownloader>())));
+                    .Add("os", new OsmAreaSource(downloader)));
             });
         }
 

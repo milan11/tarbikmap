@@ -41,7 +41,7 @@
             IDownloader downloader = new CachingDownloader(httpClientDownloader, "_download_cache");
 
             // ITaskSource taskSource = new TaskSource_Streetview(downloader, new AreaSource_Osm(downloader), true, true);
-            ITaskSource taskSource = new WikidataTaskSource();
+            ITaskSource taskSource = new WikidataTaskSource(new NoDownloader());
             IAreaSource areaSource = new NaturalEarthAreaSource();
 
             string gameType = (await taskSource.Search(searchText).ConfigureAwait(false))[gameTypeResultIndex].Key;

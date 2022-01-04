@@ -78,6 +78,7 @@ export class GameTaskResults extends Component<Props, State> {
           taskIndex={this.props.gameState.tasksCompleted}
           imagesCount={this.props.gameState.questions[this.props.gameState.tasksCompleted].imagesCount}
           onClick={() => this.setState({ imageShown: false })}
+          attributionShown={true}
         />
       );
     } else {

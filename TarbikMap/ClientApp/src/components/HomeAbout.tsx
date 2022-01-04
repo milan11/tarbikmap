@@ -1,47 +1,14 @@
 import React, { Component } from "react";
+import { HomeAboutLicenses } from "./HomeAboutLicenses";
+import { HomeAboutAttributions } from "./HomeAboutAttributions";
 import { WindowWithButtons } from "./WindowWithButtons";
 
 type Props = {};
-type State = { items: Item[]; selectedItem: number };
-
-type Item = {
-  name: string;
-  author: string | null;
-  repository: string | null;
-  license: string | null;
-  licenseText: string | null;
-};
+type State = {};
 
 export class HomeAbout extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { items: [], selectedItem: -1 };
-  }
-
-  componentDidMount() {
-    this.fetchLicenses();
-  }
-
-  async fetchLicenses() {
-    const response = await fetch("/licenses.json");
-    const json = await response.json();
-
-    let items: Item[] = [];
-    items = items.concat(json);
-
-    items.sort((a, b) => {
-      if (a.name < b.name) {
-        return -1;
-      }
-      if (a.name > b.name) {
-        return 1;
-      }
-      return 0;
-    });
-
-    this.setState({
-      items: items,
-    });
   }
 
   render() {
@@ -109,59 +76,13 @@ export class HomeAbout extends Component<Props, State> {
         </div>
 
         <h5>Client-side libraries</h5>
-        <div className="collection">
-          {this.state.items.map((item, i) => {
-            if (i === this.state.selectedItem) {
-              return this.renderDetails(item, i);
-            } else {
-              return this.renderNameOnly(item, i);
-            }
-          })}
-        </div>
+        <HomeAboutLicenses />
+
+        <h5>Home page images</h5>
+        <HomeAboutAttributions />
 
         <div>Additionally, please see NOTICE file in the source code.</div>
       </WindowWithButtons>
-    );
-  }
-
-  renderNameOnly(item: Item, key: number) {
-    return (
-      // eslint-disable-next-line
-      <a key={key} className="collection-item" onClick={() => this.setState({ selectedItem: this.state.selectedItem !== key ? key : -1 })} style={{ cursor: "pointer" }}>
-        {item.name}
-      </a>
-    );
-  }
-
-  renderDetails(item: Item, key: number) {
-    return (
-      <div key={key} className="collection-item" onClick={() => this.setState({ selectedItem: this.state.selectedItem !== key ? key : -1 })} style={{ overflowY: "scroll" }}>
-        {item.name ? (
-          <div>
-            <strong>Library:</strong> {item.name}
-          </div>
-        ) : null}
-        {item.author ? (
-          <div>
-            <strong>Author:</strong> {item.author}
-          </div>
-        ) : null}
-        {item.repository ? (
-          <div>
-            <strong>Repository:</strong> {item.repository}
-          </div>
-        ) : null}
-        {item.license ? (
-          <div>
-            <strong>License:</strong> {item.license}
-          </div>
-        ) : null}
-        {item.licenseText ? (
-          <div>
-            <strong>License text:</strong> <pre>{item.licenseText}</pre>
-          </div>
-        ) : null}
-      </div>
     );
   }
 }

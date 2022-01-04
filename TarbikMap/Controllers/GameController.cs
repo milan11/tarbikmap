@@ -419,8 +419,7 @@
             Game game = this.storage.FindGame(gameId);
 
             DateTime? expires = null;
-
-            byte[]? cachedBytes = null;
+            byte[]? cachedImageData = null;
 
             lock (game)
             {
@@ -433,28 +432,56 @@
 
                 var taskImage = task.Question.Images[imageIndex];
 
-                if (taskImage.Access == TaskImage.AccessType.HTTP)
+                if (taskImage.CachedImageData == null)
                 {
-                    if (taskImage.Cached == null)
-                    {
-                        taskImage.Cached = ImageResizer.ResizeIfNeeded(this.downloader.HttpGet(taskImage.Url).Result);
-                    }
-
-                    cachedBytes = taskImage.Cached;
+                    var imageData = this.taskSource.GetImageData(game.Configuration.Type, taskImage.ImageKey).Result;
+                    taskImage.CachedImageData = ImageResizer.ResizeIfNeeded(imageData);
                 }
+
+                cachedImageData = taskImage.CachedImageData;
             }
 
             this.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue() { Public = true, MustRevalidate = true };
             this.Response.GetTypedHeaders().Expires = expires.Value;
 
-            string contentType = "image/jpeg";
+            return this.File(cachedImageData, "image/jpeg");
+        }
 
-            if (cachedBytes != null)
+        [Route("games/{gameId}/imageAttribution/{taskIndex}/{imageIndex}")]
+        public string GetImageAttribution(string gameId, int taskIndex, int imageIndex)
+        {
+            Game game = this.storage.FindGame(gameId);
+
+            string? cachedImageAttribution = null;
+
+            lock (game)
             {
-                return this.File(cachedBytes, contentType);
+                var task = game.Tasks![taskIndex];
+                if (task == null)
+                {
+                    throw new InvalidOperationException("Task is null");
+                }
+
+                Player? currentPlayer = FindCurrentPlayer_orNull(game, this.GetSessionKeyCookie_orNull());
+                int answersCountToShow = (currentPlayer != null) ? currentPlayer.Answers.Count : game.TasksAnswered;
+
+                if (answersCountToShow < taskIndex + 1)
+                {
+                    throw new InvalidOperationException("Invalid task index");
+                }
+
+                var taskImage = task.Question.Images[imageIndex];
+
+                if (taskImage.CachedImageAttribution == null)
+                {
+                    var imageAttribution = this.taskSource.GetImageAttribution(game.Configuration.Type, taskImage.ImageKey).Result;
+                    taskImage.CachedImageAttribution = imageAttribution;
+                }
+
+                cachedImageAttribution = taskImage.CachedImageAttribution;
             }
 
-            throw new InvalidOperationException("Unhandled image serving type");
+            return cachedImageAttribution;
         }
 
         [HttpPost]
@@ -520,12 +547,12 @@
         {
             List<PresetDTO> result = new List<PresetDTO>();
 
-            result.Add(new PresetDTO("Custom", "Choose any area and game type.", "Bela_river_Slovakia.jpg", "wd_places", "co_world"));
-            result.Add(new PresetDTO("World - Capitals", string.Empty, "Tokyo_Tower_and_around_Skyscrapers.jpg", "wd_capitals", "co_world"));
-            result.Add(new PresetDTO("Europe - Capitals", string.Empty, "Eiffel_Tower_from_the_Tour_Montparnasse_3,_Paris_May_2014.jpg", "wd_capitals", "ne_ne_10m_geography_regions_polys_1026"));
-            result.Add(new PresetDTO("Europe - Railway Stations", string.Empty, "1280px-2011-03-29_Hauptbahnhof_interior_2.jpg", "wd_railway_stations", "ne_ne_10m_geography_regions_polys_1026"));
-            result.Add(new PresetDTO("Towns in Slovakia", string.Empty, "Bardejov_namesti_3773.jpg", "wd_towns", "ne_ne_10m_admin_0_countries_77"));
-            result.Add(new PresetDTO("Castles in Slovakia", string.Empty, "Bojnice_Bojnitz_Castle_by_Pudelek.jpg", "wd_castles", "ne_ne_10m_admin_0_countries_77"));
+            result.Add(new PresetDTO("Custom", "Choose any area and game type.", "Bela_river_Slovakia.jpg", "Dodoni, CC BY-SA 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>, via Wikimedia Commons", "wd_places", "co_world"));
+            result.Add(new PresetDTO("World - Capitals", string.Empty, "Tokyo_Tower_and_around_Skyscrapers.jpg", "Volfgang, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons", "wd_capitals", "co_world"));
+            result.Add(new PresetDTO("Europe - Capitals", string.Empty, "Eiffel_Tower_from_the_Tour_Montparnasse_3,_Paris_May_2014.jpg", "David McSpadden from Daly City, United States, CC BY 2.0 <https://creativecommons.org/licenses/by/2.0>, via Wikimedia Commons", "wd_capitals", "ne_ne_10m_geography_regions_polys_1026"));
+            result.Add(new PresetDTO("Europe - Railway Stations", string.Empty, "1280px-2011-03-29_Hauptbahnhof_interior_2.jpg", "User:Orderinchaos, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons", "wd_railway_stations", "ne_ne_10m_geography_regions_polys_1026"));
+            result.Add(new PresetDTO("Towns in Slovakia", string.Empty, "Bardejov_namesti_3773.jpg", "I, Krokodyl, CC BY-SA 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>, via Wikimedia Commons", "wd_towns", "ne_ne_10m_admin_0_countries_77"));
+            result.Add(new PresetDTO("Castles in Slovakia", string.Empty, "Bojnice_Bojnitz_Castle_by_Pudelek.jpg", "Pudelek, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons", "wd_castles", "ne_ne_10m_admin_0_countries_77"));
 
             return result;
         }
@@ -668,6 +695,18 @@
             {
                 throw new InvalidOperationException("Current player not found");
             }
+        }
+
+        private static Player? FindCurrentPlayer_orNull(Game game, string? sessionKey)
+        {
+            Player? result = null;
+
+            if (sessionKey != null)
+            {
+                result = game.Players.SingleOrDefault(p => p.SessionKey == sessionKey);
+            }
+
+            return result;
         }
 
         private void SendGameState(string gameId)
