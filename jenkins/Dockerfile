@@ -1,4 +1,5 @@
 FROM jenkins/jenkins:2.327-jdk11
+ARG dockerGroupId
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 ENV CASC_JENKINS_CONFIG /var/jenkins_home/casc.yaml
 RUN jenkins-plugin-cli --plugins configuration-as-code:1.55
@@ -12,7 +13,7 @@ RUN jenkins-plugin-cli --plugins jaxb:2.3.0.1
 RUN jenkins-plugin-cli --plugins ws-cleanup:0.40
 COPY casc.yaml /var/jenkins_home/casc.yaml
 USER root
-RUN groupadd --gid 984 docker
+RUN groupadd --gid $dockerGroupId docker
 RUN apt-get update && apt-get install -y docker.io
 RUN usermod -a -G docker jenkins
 USER jenkins
