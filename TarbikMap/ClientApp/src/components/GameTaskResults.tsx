@@ -90,6 +90,7 @@ export class GameTaskResults extends Component<Props, State> {
               <ButtonWithLoading
                 text="Continue"
                 className="btn"
+                disabled={false}
                 automaticallyResetLoading={false}
                 onClick={async () => {
                   fetch("games/" + encodeURIComponent(this.props.match.params.gameId) + "/complete/" + encodeURIComponent(this.props.gameState.tasksCompleted), {

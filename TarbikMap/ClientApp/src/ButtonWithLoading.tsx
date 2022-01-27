@@ -3,6 +3,7 @@ import React, { Component } from "react";
 type Props = {
   text: string;
   className: string;
+  disabled: boolean;
   automaticallyResetLoading: boolean;
   onClick: () => void;
 };
@@ -23,7 +24,7 @@ export class ButtonWithLoading extends Component<Props, State> {
     return (
       <button
         className={this.props.className}
-        disabled={this.state.loading}
+        disabled={this.props.disabled || this.state.loading}
         onClick={() => {
           this.setState({ loading: true }, async () => {
             await this.props.onClick();

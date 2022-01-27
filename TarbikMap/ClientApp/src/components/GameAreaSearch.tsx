@@ -57,8 +57,9 @@ export class GameAreaSearch extends Component<Props, State> {
             />
             <ButtonWithLoading
               text="Search"
-              automaticallyResetLoading={true}
               className="btn"
+              disabled={false}
+              automaticallyResetLoading={true}
               onClick={async () => {
                 await this.fetchConfigurations();
               }}

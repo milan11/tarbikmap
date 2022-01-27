@@ -30,7 +30,7 @@ export class GamePlayerSelection extends Component<Props, State> {
     super(props);
 
     this.state = {
-      playerName: decodeURIComponent(atob(getCookie("player_name"))),
+      playerName: decodeURIComponent(atob(getCookie("player_name"))) ?? "",
       gameTypeSelectionShown: false,
       gameAreaSearchShown: false,
       mapStyleShown: false,
@@ -259,6 +259,7 @@ export class GamePlayerSelection extends Component<Props, State> {
                     <ButtonWithLoading
                       text="Join"
                       className="btn"
+                      disabled={this.state.playerName === ""}
                       automaticallyResetLoading={false}
                       onClick={async () => {
                         const playerName = this.state.playerName.trim();
@@ -317,6 +318,7 @@ export class GamePlayerSelection extends Component<Props, State> {
         <ButtonWithLoading
           text={"Confirm (" + this.getCountMessage() + ")"}
           className="btn btn-success"
+          disabled={false}
           automaticallyResetLoading={false}
           onClick={async () => {
             fetch("games/" + encodeURIComponent(this.props.match.params.gameId) + "/start", {
