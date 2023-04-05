@@ -20,7 +20,7 @@ namespace TarbikMap.DataSources.OsmOverpass
 
         private static async Task<OsmOverpassApiResult> QueryOverpass(IDownloader downloader, long relationId)
         {
-            byte[] content = await downloader.HttpPost(new Uri("https://lz4.overpass-api.de/api/interpreter"), Encoding.UTF8.GetBytes("[out:json];\nrel(" + relationId + ");\nway(r);\nout geom;\n")).ConfigureAwait(false);
+            byte[] content = await downloader.HttpPost(new Uri("https://overpass-api.de/api/interpreter"), Encoding.UTF8.GetBytes("[out:json];\nrel(" + relationId + ");\nway(r);\nout geom;\n")).ConfigureAwait(false);
             return JsonSerializer.Deserialize<OsmOverpassApiResult>(content)!;
         }
 
